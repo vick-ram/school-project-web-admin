@@ -8,10 +8,10 @@
         flat
         dense
         round
-        icon="menu"
+        icon="menu_open"
         aria-label="Menu"
         @click="store.toggleDrawer"
-        style="color: #34495e; size: 30px"
+        style="color: #34495e; size: 40px; background-color: lightblue"
       />
 
       <q-toolbar-title
@@ -28,14 +28,7 @@
           icon="dark_mode"
           aria-label="Toggle Dark Mode"
           @click="$emit('toggleDarkMode')"
-        />
-        <q-btn
-          flat
-          dense
-          round
-          icon="notifications"
-          aria-label="Notifications"
-          class="q-ml-md"
+          style="background-color: lightblue"
         />
         <q-btn
           flat
@@ -45,6 +38,7 @@
           aria-label="Logout"
           @click="logOut"
           class="q-ml-lg"
+          style="background-color: lightblue"
         />
       </div>
     </q-toolbar>

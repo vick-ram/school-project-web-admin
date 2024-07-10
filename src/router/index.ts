@@ -41,7 +41,7 @@ export default route(function (/* { store, ssrContext } */) {
     if (authenticated && !token) {
       next({ name: 'sign_in' });
     } else if ((to.name === 'sign_in' || to.name === 'sign_up') && token) {
-      next({ name: 'dashboard' });
+      next('/');
     } else {
       next();
     }

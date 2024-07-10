@@ -1,6 +1,7 @@
 <template>
   <div q-pa-md>
     <q-table
+      class="table-header"
       flat
       bordered
       :rows="customers"
@@ -9,6 +10,8 @@
       title="Customers"
       :filter="search"
       :loading="loading"
+      hide-bottom
+      :rows-per-page-options="[-1]"
     >
       <template v-slot:top-right>
         <q-input
@@ -20,12 +23,13 @@
           class="q-mr-md"
         >
           <template v-slot:append>
-            <q-icon name="search" />
+            <q-icon name="search" color="white" />
           </template>
         </q-input>
         <q-btn
+          flat
           dense
-          color="primary"
+          color="white"
           round
           icon="person_add"
           class="q-pa-md"
@@ -64,7 +68,14 @@
       </template>
       <template v-slot:body-cell-status="props">
         <q-td :props="props">
-          {{ props.row.status }}
+          <q-btn
+            flat
+            dense
+            :color="props.row.status === 'PENDING' ? 'orange' : 'green'"
+            @click="updateStatus(props.row)"
+          >
+            {{ props.row.status }}
+          </q-btn>
         </q-td>
       </template>
       <template v-slot:body-cell-createdAt="props">
@@ -79,40 +90,82 @@
       </template>
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
-          <q-btn
-            label="Edit"
-            flat
-            dense
+          <q-icon
+            name="edit"
             size="sm"
             color="primary"
+            class="cursor-pointer"
             @click="openEditDialog(props.row)"
           />
-          <q-btn
-            label="Delete"
-            flat
-            dense
+          <q-icon
+            name="delete"
             size="sm"
             color="negative"
             @click="deleteCustomer(props.row)"
-            class="q-ml-sm"
+            class="q-ml-md cursor-pointer"
           />
         </q-td>
       </template>
     </q-table>
     <AddNewCustomer />
-    <EditCustomer />
+    <template>
+      <q-dialog v-model="editDialog">
+        <div style="min-width: 400px">
+          <q-card>
+            <q-card-section>
+              <q-form @submit.prevent="onSubmit" class="q-pa-md q-gutter-md">
+                <q-input
+                  label="Username"
+                  v-model="customerStore.customer.username"
+                />
+                <q-input
+                  label="first Name"
+                  v-model="customerStore.customer.firstName"
+                />
+                <q-input
+                  label="Last Name"
+                  v-model="customerStore.customer.lastName"
+                />
+                <q-input
+                  label="Phone"
+                  v-model="customerStore.customer.phone"
+                  type="text"
+                  required
+                />
+                <q-input
+                  type="email"
+                  label="Email"
+                  v-model="customerStore.customer.email"
+                />
+                <q-input
+                  type="password"
+                  label="Password"
+                  v-model="customerStore.customer.password"
+                />
+                <q-btn color="secondary" label="Update" @click="onSubmit" />
+                <q-btn
+                  color="secondary"
+                  label="Cancel"
+                  @click="closeEditDialog"
+                />
+              </q-form>
+            </q-card-section>
+          </q-card>
+        </div>
+      </q-dialog>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { QTableColumn } from 'quasar';
 import { useStore1 } from 'src/stores/store1';
 import { useCustomerStore } from 'src/stores/customerStore';
 import AddNewCustomer from 'src/components/AddNewCustomer.vue';
-import EditCustomer from 'src/components/EditCustomer.vue';
 import { api } from 'src/boot/axios';
 import { useQuasar } from 'quasar';
+const editDialog = ref(false);
 
 const store = useStore1();
 const $q = useQuasar();
@@ -120,12 +173,64 @@ const search = ref('');
 const customers = ref<Customer[]>([]);
 const loading = ref(true);
 const customerStore = useCustomerStore();
-
-const editedCustomer = ref<Customer | null>(null);
+const editedIndex = ref(-1);
+const customerId = ref<string | null>(null);
 
 const openEditDialog = (customer: Customer) => {
-  editedCustomer.value = Object.assign({}, customer);
-  store.openDialog();
+  const fullName = customer.fullName.split(' ');
+  editedIndex.value = customers.value.indexOf(customer);
+  customerId.value = customer.id;
+  customerStore.customer = {
+    username: customer.username,
+    firstName: fullName[0],
+    lastName: fullName.slice(1).join(' '),
+    phone: customer.phone,
+    email: customer.email,
+    password: '',
+  };
+  editDialog.value = true;
+};
+
+watch(
+  editDialog,
+  (newValue) => {
+    if (!newValue) {
+      customerStore.resetCustomer();
+    }
+  },
+  { immediate: true }
+);
+
+const onSubmit = () => {
+  if (!customerId.value) return;
+  console.log(`This is customer id: ${customerId.value}`);
+  api
+    .put(`/customer/${customerId.value}`, customerStore.customer)
+    .then((response) => {
+      if (response.data.status === 'success') {
+        $q.notify({
+          message: response.data.message,
+          color: 'green',
+        });
+        customerStore.fetchCustomers();
+        customerStore.resetCustomer();
+        editDialog.value = false;
+      } else if (response.data.status === 'error') {
+        console.log(response.data.error);
+        throw new Error(response.data.error);
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+      $q.notify({
+        message: String(e),
+        color: 'red',
+      });
+    });
+};
+const closeEditDialog = () => {
+  editDialog.value = false;
+  customerStore.resetCustomer();
 };
 
 const deleteCustomer = (customer: Customer) => {
@@ -152,6 +257,7 @@ const deleteCustomer = (customer: Customer) => {
             message: response.data.message,
             color: 'green',
           });
+          customerStore.fetchCustomers();
         } else if (response.data.status === 'error') {
           throw new Error(response.data.error);
         }
@@ -164,6 +270,31 @@ const deleteCustomer = (customer: Customer) => {
         console.log(e);
       });
   });
+};
+
+const updateStatus = (customer: Customer) => {
+  const newStatus = customer.status === 'PENDING' ? 'APPROVED' : 'PENDING';
+  api
+    .patch(`/customer/${customer.id}`, { status: newStatus })
+    .then((response) => {
+      if (response.data.status === 'success') {
+        customer.status = newStatus;
+        $q.notify({
+          message: response.data.message,
+          color: 'green',
+        });
+        customerStore.fetchCustomers();
+      } else if (response.data.status === 'error') {
+        throw new Error(response.data.error);
+      }
+    })
+    .catch((e) => {
+      console.log(e);
+      $q.notify({
+        message: String(e),
+        color: 'red',
+      });
+    });
 };
 
 onMounted(async () => {

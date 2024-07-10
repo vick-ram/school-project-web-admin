@@ -1,50 +1,77 @@
 <template>
   <q-drawer
-    :width="250"
+    :width="220"
     :persistent="true"
     :breakpoint="768"
     show-if-above
     bordered
-    class="text-white"
+    class="text-white no-scroll"
     v-model="store.drawerOpen"
-    style="background-color: #34495e"
+    style="background-color: #008080"
   >
+    <div
+      style="
+        padding-top: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <q-img
+        src="/src//assets/titossy_img.png"
+        style="width: 60px; height: 60px; cursor: pointer"
+        @click="$router.push('/')"
+      />
+    </div>
+
     <q-scroll-area class="fit" :horizontal-thumb-style="{ opacity: String(0) }">
       <q-list padding>
-        <q-item
-          v-for="(item, index) in mainDrawerList"
-          :key="index"
-          :to="item.path"
-          clickable
-          v-ripple
-          class="custom-item"
-          :active="isActiveRoute(item.path)"
+        <div
+          class="flex"
+          style="
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            justify-content: space-between;
+          "
         >
-          <q-item-section avatar>
-            <q-icon :name="item.icon" />
-          </q-item-section>
-          <q-item-section>
-            {{ item.label }}
-          </q-item-section>
-        </q-item>
-        <q-separator spaced class="custom-separator" />
-        <div class="bottom-items">
-          <q-item
-            v-for="(item, index) in bottomDrawerList"
-            :key="index"
-            :to="item.path"
-            clickable
-            v-ripple
-            class="custom-item"
-            :active="isActiveRoute(item.path)"
-          >
-            <q-item-section avatar>
-              <q-icon :name="item.icon" />
-            </q-item-section>
-            <q-item-section>
-              {{ item.label }}
-            </q-item-section>
-          </q-item>
+          <div>
+            <q-item
+              v-for="(item, index) in mainDrawerList"
+              :key="index"
+              :to="item.path"
+              clickable
+              v-ripple
+              class="custom-item"
+              :active="isActiveRoute(item.path)"
+            >
+              <q-item-section avatar>
+                <q-icon :name="item.icon" />
+              </q-item-section>
+              <q-item-section>
+                {{ item.label }}
+              </q-item-section>
+            </q-item>
+          </div>
+          <q-separator spaced class="custom-separator" />
+          <div>
+            <q-item
+              v-for="(item, index) in bottomDrawerList"
+              :key="index"
+              :to="item.path"
+              clickable
+              v-ripple
+              class="custom-item"
+              :active="isActiveRoute(item.path)"
+            >
+              <q-item-section avatar>
+                <q-icon :name="item.icon" />
+              </q-item-section>
+              <q-item-section>
+                {{ item.label }}
+              </q-item-section>
+            </q-item>
+          </div>
         </div>
       </q-list>
     </q-scroll-area>
@@ -54,11 +81,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useStore1 } from 'src/stores/store1';
-import { useQuasar } from 'quasar';
 import { useRoute } from 'vue-router';
 
 const store = useStore1();
-const $q = useQuasar();
 const route = useRoute();
 
 const isActiveRoute = (path: string) => {
@@ -67,55 +92,73 @@ const isActiveRoute = (path: string) => {
 
 const drawerList = [
   {
-    icon: 'dashboard',
-    label: 'Dashboard',
+    icon: 'img:/src/assets/customer-icon.png',
+    label: 'Customers',
     path: '/',
   },
   {
-    icon: 'people',
-    label: 'Customers',
-    path: '/customer',
-  },
-  {
-    icon: 'local_shipping',
+    icon: 'img:/src/assets/delivery.png',
     label: 'Suppliers',
     path: '/supplier',
   },
   {
-    icon: 'badge',
+    icon: 'img:/src/assets/team.png',
     label: 'Employees',
     path: '/employee',
   },
   {
-    icon: 'book_online',
+    icon: 'img:/src/assets/calendar.png',
     label: 'Bookings',
     path: '/booking',
   },
   {
-    icon: 'paid',
+    icon: 'img:/src/assets/cleaning.png',
+    label: 'Services',
+    path: '/service',
+  },
+  {
+    icon: 'img:/src/assets/inventory.png',
+    label: 'Inventory',
+    path: '/inventory',
+  },
+  {
+    icon: 'img:/src/assets/increase.png',
     label: 'Revenue',
     path: '/revenue',
   },
   {
-    icon: 'help',
+    icon: 'img:/src/assets/help.png',
     label: 'Help',
     path: '/help',
   },
   {
-    icon: 'settings',
+    icon: 'img:/src/assets/settings.png',
     label: 'Settings',
     path: '/settings',
   },
 ];
 
-const mainDrawerList = computed(() => drawerList.slice(0, 6));
-const bottomDrawerList = computed(() => drawerList.slice(6));
+const mainDrawerList = computed(() => drawerList.slice(0, 7));
+const bottomDrawerList = computed(() => drawerList.slice(7));
 </script>
 
 <style scoped>
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  padding-top: 15px;
+}
+
+.avatar-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
 .custom-item {
   transition: background-color 0.3s;
-  margin: 15px 10px;
+  margin: 10px 10px;
   padding: 10px 15px;
   border-radius: 8px;
 }
@@ -135,12 +178,6 @@ const bottomDrawerList = computed(() => drawerList.slice(6));
 .q-item-section.text-center {
   display: flex;
   justify-content: center;
-}
-
-.bottom-items {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
 }
 
 .q-separator.custom-separator {

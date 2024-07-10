@@ -2,63 +2,36 @@
   <div class="q-pa-md" style="min-width: 400px">
     <q-card>
       <q-card-section>
-        <q-form @submit.prevent="createSupplier" class="q-gutter-md">
+        <q-form
+          @submit.prevent="supplierStore.createSupplier"
+          class="q-gutter-md"
+        >
           <q-input
-            v-model="supplier.username"
-            label="Username"
-            type="text"
-            required
-          />
-          <q-input
-            v-model="supplier.firstName"
+            v-model="supplierStore.supplier.firstName"
             label="First Name"
             type="text"
             required
           />
           <q-input
-            v-model="supplier.lastName"
+            v-model="supplierStore.supplier.lastName"
             label="Last Name"
             type="text"
             required
           />
           <q-input
-            v-model="supplier.phone"
+            v-model="supplierStore.supplier.phone"
             label="Phone"
             type="text"
             required
           />
           <q-input
-            v-model="supplier.company"
-            label="Company"
-            type="text"
-            required
-          />
-          <q-input
-            v-model="supplier.address.county"
-            label="County"
-            type="text"
-            required
-          />
-          <q-input
-            v-model="supplier.address.region"
-            label="Region"
-            type="text"
-            required
-          />
-          <q-input
-            v-model="supplier.address.postalCode"
-            label="Postal Code"
-            type="text"
-            required
-          />
-          <q-input
-            v-model="supplier.email"
+            v-model="supplierStore.supplier.email"
             label="Email"
             type="email"
             required
           />
           <q-input
-            v-model="supplier.password"
+            v-model="supplierStore.supplier.password"
             label="Password"
             :type="showPassword ? 'text' : 'password'"
             required
@@ -77,9 +50,9 @@
         <q-btn
           class="create-btn"
           dense
-          color="primary"
-          label="Create"
-          @click="createSupplier"
+          color="secondary"
+          label="Create Supplier"
+          @click="supplierStore.createSupplier"
         />
       </q-card-actions>
     </q-card>
@@ -88,64 +61,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { api } from 'src/boot/axios';
-import { useQuasar } from 'quasar';
-import { useStore1 } from 'src/stores/store1';
+import { useSupplierStore } from 'src/stores/supplierStore';
 
-const $q = useQuasar();
-const store = useStore1();
-
-const supplier = ref({
-  username: '',
-  firstName: '',
-  lastName: '',
-  phone: '',
-  company: '',
-  address: {
-    county: '',
-    region: '',
-    postalCode: '',
-  },
-  email: '',
-  password: '',
-});
+const supplierStore = useSupplierStore();
 const showPassword = ref(false);
-
-const createSupplier = () => {
-  api
-    .post('/supplier/auth/sign_up', supplier.value)
-    .then((response) => {
-      if (response.data.status === 'success') {
-        $q.notify({
-          message: response.data.message,
-          color: 'green',
-        });
-        store.dialogOpen = false;
-        supplier.value = {
-          username: '',
-          firstName: '',
-          lastName: '',
-          phone: '',
-          company: '',
-          address: {
-            county: '',
-            region: '',
-            postalCode: '',
-          },
-          email: '',
-          password: '',
-        };
-      } else if (response.data.status === 'error') {
-        throw new Error(response.data.error);
-      }
-    })
-    .catch((e) => {
-      $q.notify({
-        message: e,
-        color: 'red',
-      });
-    });
-};
 </script>
 
 <style scoped>
