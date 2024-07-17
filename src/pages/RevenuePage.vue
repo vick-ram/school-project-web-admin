@@ -91,6 +91,36 @@
         </q-tr>
       </template>
     </q-table>
+    <div class="q-mt-xl">
+      <q-table
+        class="table-header"
+        :rows="supplierPayments"
+        :columns="supplierColumns"
+        :loading="loading"
+        title="Expenditure"
+        bordered
+        row-key="name"
+        flat
+        :filter="search"
+        hide-bottom
+        :rows-per-page-options="[-1]"
+      >
+        <template #top-right>
+          <q-input v-model="search" flat dense placeholder="Search" borderless>
+            <template #prepend>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
+        <template #body-cell-status="props">
+          <q-td :props="props">
+            <span :class="statusColors(props.row.status)">
+              {{ props.row.status }}
+            </span>
+          </q-td>
+        </template>
+      </q-table>
+    </div>
   </div>
 </template>
 
@@ -102,10 +132,12 @@ import { api } from 'src/boot/axios';
 
 const revenueStore = useRevenueStore();
 const filter = ref('');
+const search = ref('');
 const loading = ref(false);
 const $q = useQuasar();
 
 const customerPayments = ref<CustomerPayment[]>([]);
+const supplierPayments = ref<SupplierPayment[]>([]);
 
 onMounted(async () => {
   loading.value = true;
@@ -113,6 +145,16 @@ onMounted(async () => {
   const storePayments = revenueStore.customerPayments;
   if (storePayments) {
     customerPayments.value = storePayments;
+  }
+  loading.value = false;
+});
+
+onMounted(async () => {
+  loading.value = true;
+  await revenueStore.fetchSupplierPayments();
+  const storePayments = revenueStore.supplierPayments;
+  if (storePayments) {
+    supplierPayments.value = storePayments;
   }
   loading.value = false;
 });
@@ -229,6 +271,86 @@ const columns: QTableColumn<CustomerPayment>[] | any = [
     label: 'CREATED AT',
     align: 'left',
     field: 'createdAt',
+    sortable: true,
+  },
+  {
+    name: 'updatedAt',
+    label: 'UPDATED AT',
+    align: 'left',
+    field: 'updatedAt',
+    sortable: true,
+  },
+  {
+    name: 'actions',
+    label: 'ACTIONS',
+    align: 'left',
+    field: 'actions',
+    sortable: false,
+  },
+];
+
+const supplierColumns: QTableColumn<SupplierPayment>[] | any = [
+  {
+    name: 'paymentId',
+    label: 'PAYMENT ID',
+    align: 'left',
+    field: 'paymentId',
+    sortable: true,
+  },
+  {
+    name: 'employee',
+    label: 'Processed By',
+    align: 'left',
+    field: 'employee',
+    sortable: true,
+  },
+  {
+    name: 'orderId',
+    label: 'ORDER ID',
+    align: 'left',
+    field: 'orderId',
+    sortable: true,
+  },
+  {
+    name: 'supplier',
+    label: 'Supplier',
+    align: 'left',
+    field: 'supplier',
+    sortable: true,
+  },
+  {
+    name: 'date',
+    label: 'Processd On',
+    align: 'left',
+    field: 'paymentDate',
+    sortable: true,
+  },
+  {
+    name: 'amount',
+    label: 'Amount',
+    align: 'left',
+    field: 'amount',
+    sortable: true,
+  },
+  {
+    name: 'method',
+    label: 'METHOD',
+    align: 'left',
+    field: 'method',
+    sortable: true,
+  },
+  {
+    name: 'reference',
+    label: 'REFERENCE NO.',
+    align: 'left',
+    field: 'paymentReference',
+    sortable: false,
+  },
+  {
+    name: 'status',
+    label: 'PAYMENT STATUS',
+    align: 'left',
+    field: 'status',
     sortable: true,
   },
   {

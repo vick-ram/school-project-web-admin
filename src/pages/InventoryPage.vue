@@ -29,8 +29,42 @@
           </template>
         </q-input>
       </template>
-      <template #body-cell-image="props">
-        <q-img :src="props.row.image" width="100" height="50" />
+      <template #body="props">
+        <q-tr :props="props">
+          <q-td key="productId" :props="props">
+            {{ props.row.productId }}
+          </q-td>
+          <q-td key="name" :props="props">
+            {{ props.row.name }}
+          </q-td>
+          <q-td key="description" :props="props">
+            {{ props.row.description }}
+          </q-td>
+          <q-td key="price" :props="props">
+            {{ props.row.unitPrice }}
+          </q-td>
+          <q-td key="image" :props="props">
+            <q-img :src="props.row.image" width="100" heigh="50" />
+          </q-td>
+          <q-td key="stock" :props="props">
+            {{ props.row.stock }}
+          </q-td>
+          <q-td key="reorderLevel" :props="props">
+            {{ props.row.reorderLevel }}
+          </q-td>
+          <q-td key="sku" :props="props">
+            {{ props.row.sku }}
+          </q-td>
+          <q-td key="createdAt" :props="props">
+            {{ props.row.createdAt }}
+          </q-td>
+          <q-td key="updatedAt" :props="props">
+            {{ props.row.updatedAt }}
+          </q-td>
+          <q-td key="actions" :props="props">
+            <q-btn icon="more_vert" flat round dense />
+          </q-td>
+        </q-tr>
       </template>
     </q-table>
   </div>
@@ -45,7 +79,7 @@ const productStore = useInventoryStore();
 const products = ref<Inventory[]>([]);
 const filter = ref('');
 const loading = ref(true);
-const columns: QTableColumn<Inventory>[] = [
+const columns: QTableColumn<Inventory>[] | any = [
   {
     name: 'productId',
     required: true,
@@ -125,6 +159,13 @@ const columns: QTableColumn<Inventory>[] = [
     align: 'left',
     field: 'updatedAt',
     sortable: true,
+  },
+  {
+    name: 'actions',
+    required: true,
+    label: 'Actions',
+    align: 'center',
+    sortable: false,
   },
 ];
 

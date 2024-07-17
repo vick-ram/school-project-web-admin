@@ -27,6 +27,7 @@ export const usebookingStore = defineStore('booking', {
             createdAt: formatTimestamp(booking.createdAt),
             updatedAt: formatTimestamp(booking.updatedAt),
           }));
+          console.log(this.bookings);
         } else if (response.data.status === 'error') {
           throw new Error(response.data.error);
         }

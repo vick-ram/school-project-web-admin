@@ -7,8 +7,6 @@ import EmployeesPage from 'pages/EmployeesPage.vue';
 import RevenuePage from 'pages/RevenuePage.vue';
 import MainLayout from 'src/layouts/MainLayout.vue';
 import ServicesPage from 'src/pages/ServicesPage.vue';
-import HelpPage from 'src/pages/HelpPage.vue';
-import SettingsPage from 'src/pages/SettingsPage.vue';
 import InventoryPage from 'src/pages/InventoryPage.vue';
 import ServiceDetails from 'src/components/ServiceDetails.vue';
 
@@ -57,18 +55,6 @@ const routes: RouteRecordRaw[] = [
         path: 'inventory',
         name: 'inventory',
         component: InventoryPage,
-        meta: { requiresAuth: true },
-      },
-      {
-        path: 'help',
-        name: 'help',
-        component: HelpPage,
-        meta: { requiresAuth: true },
-      },
-      {
-        path: 'settings',
-        name: 'settings',
-        component: SettingsPage,
         meta: { requiresAuth: true },
       },
       {

@@ -272,29 +272,28 @@ const deleteCustomer = (customer: Customer) => {
   });
 };
 
-const updateStatus = (customer: Customer) => {
+const updateStatus = async (customer: Customer) => {
   const newStatus = customer.status === 'PENDING' ? 'APPROVED' : 'PENDING';
-  api
-    .patch(`/customer/${customer.id}`, { status: newStatus })
-    .then((response) => {
-      if (response.data.status === 'success') {
-        customer.status = newStatus;
-        $q.notify({
-          message: response.data.message,
-          color: 'green',
-        });
-        customerStore.fetchCustomers();
-      } else if (response.data.status === 'error') {
-        throw new Error(response.data.error);
-      }
-    })
-    .catch((e) => {
-      console.log(e);
-      $q.notify({
-        message: String(e),
-        color: 'red',
-      });
+  try {
+    const response = await api.patch(`/customer/${customer.id}`, {
+      status: newStatus,
     });
+    if (response.data.status === 'success') {
+      customer.status = newStatus;
+      $q.notify({
+        message: response.data.message,
+        color: 'green',
+      });
+      await customerStore.fetchCustomers();
+    } else if (response.data.status === 'error') {
+      throw new Error(response.data.error);
+    }
+  } catch (error) {
+    $q.notify({
+      message: String(error),
+      color: 'red',
+    });
+  }
 };
 
 onMounted(async () => {

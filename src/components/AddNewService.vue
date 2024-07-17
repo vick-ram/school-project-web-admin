@@ -55,7 +55,7 @@ const onSubmit = async () => {
   formData.append('description', service.value.description);
   formData.append('price', formatPrice(service.value.price));
   if (service.value.image) {
-    formData.append('image', service.value.image);
+    formData.append('imageUrl', service.value.image);
   }
 
   try {
@@ -70,6 +70,7 @@ const onSubmit = async () => {
       throw new Error(response.data.error);
     }
   } catch (error) {
+    console.log(error);
     $q.notify({
       message: String(error),
       color: 'red',
@@ -77,4 +78,3 @@ const onSubmit = async () => {
   }
 };
 </script>
-<style scoped></style>

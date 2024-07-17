@@ -43,6 +43,7 @@ const router = useRouter();
 const $q = useQuasar();
 
 const signIn = () => {
+  console.log(admin.value);
   api
     .post('/employee/auth/sign_in', admin.value)
     .then((res) => {
@@ -53,14 +54,14 @@ const signIn = () => {
           message: res.data.message,
           color: 'green',
         });
-        router.push({ name: 'dashboard' });
+        router.push({ name: 'customer' });
       } else if (res.data.status === 'error') {
         throw new Error(res.data.error);
       }
     })
     .catch((e) => {
       $q.notify({
-        message: e,
+        message: String(e),
         color: 'red',
       });
     });

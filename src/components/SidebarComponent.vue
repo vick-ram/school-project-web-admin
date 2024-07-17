@@ -126,16 +126,6 @@ const drawerList = [
     label: 'Revenue',
     path: '/revenue',
   },
-  {
-    icon: 'img:/src/assets/help.png',
-    label: 'Help',
-    path: '/help',
-  },
-  {
-    icon: 'img:/src/assets/settings.png',
-    label: 'Settings',
-    path: '/settings',
-  },
 ];
 
 const mainDrawerList = computed(() => drawerList.slice(0, 7));

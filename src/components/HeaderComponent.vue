@@ -56,22 +56,28 @@ const $q = useQuasar();
 const router = useRouter();
 
 const logOut = () => {
-  api.post('/employee/auth/sign_out').then((res) => {
-    if (res.data.status === 'success') {
-      localStorage.removeItem('token');
+  api
+    .post('/employee/auth/sign_out')
+    .then((res) => {
+      if (res.data.status === 'success') {
+        localStorage.removeItem('token');
+        $q.notify({
+          message: res.data.message,
+          color: 'green',
+        });
+        router.push({ name: 'sign_in' });
+      } else if (res.data.status === 'error') {
+        throw new Error(res.data.error);
+      }
+    })
+    .catch((error) => {
+      console.log(error);
       $q.notify({
-        message: res.data.message,
-        color: 'green',
-      });
-      router.push({ name: 'sign_in' });
-    } else if (res.data.status === 'error') {
-      $q.notify({
-        message: res.data.error,
+        message: String(error),
         color: 'red',
       });
-      console.log(res.data.error);
-    }
-  });
+      localStorage.clear();
+    });
 };
 </script>
 
